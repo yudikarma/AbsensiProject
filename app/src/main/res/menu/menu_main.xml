@@ -3,8 +3,30 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.alfattah.absensiproject.MainActivity">
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/dashboard"
         android:orderInCategory="100"
-        android:title="@string/action_settings"
+        android:title="Dashboard"
+        android:icon="@drawable/ic_dashboard_black_24dp"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/acountSettings"
+        android:orderInCategory="100"
+        android:title="Settings"
+        android:icon="@drawable/ic_settings_applications_black_24dp"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/Logout"
+        android:orderInCategory="100"
+        android:title="Log out"
+        android:icon="@drawable/logout"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/about"
+        android:orderInCategory="100"
+        android:title="About"
+        android:icon="@drawable/help"
         app:showAsAction="never" />
 </menu>

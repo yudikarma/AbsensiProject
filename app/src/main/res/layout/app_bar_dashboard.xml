@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.design.widget.AppBarLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/appbar"
+    android:layout_width="match_parent"
+    android:background="@color/hitamflat"
+    android:layout_height="wrap_content"
+    android:theme="@style/AppTheme.AppBarOverlay">
+
+
+    <android.support.design.widget.TabLayout
+        android:id="@+id/tabs"
+        android:layout_width="match_parent"
+
+
+        android:layout_height="55dp">
+
+
+        <android.support.design.widget.TabItem
+            android:id="@+id/tabItem2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/birutua"
+            android:icon="@drawable/ef_ic_camera_white"
+            android:text="Check IN" />
+
+        <android.support.design.widget.TabItem
+            android:id="@+id/tabItem3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/birutua"
+            android:icon="@drawable/ic_location_city_black_24dp"
+             />
+
+        <android.support.design.widget.TabItem
+            android:id="@+id/tabItem"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/birutua"
+            android:icon="@drawable/ic_exit_to_app_black_24dp"
+            android:text="CHECK OUT" />
+
+    </android.support.design.widget.TabLayout>
+</android.support.design.widget.AppBarLayout>
