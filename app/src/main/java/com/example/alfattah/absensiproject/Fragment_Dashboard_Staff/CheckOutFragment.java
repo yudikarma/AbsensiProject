@@ -4,6 +4,8 @@ package com.example.alfattah.absensiproject.Fragment_Dashboard_Staff;
 import android.app.ProgressDialog;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -12,19 +14,28 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.alfattah.absensiproject.R;
 import com.example.alfattah.absensiproject.utils.PreferenceManager;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -51,8 +62,9 @@ public class CheckOutFragment extends Fragment {
     private FirebaseUser mCurrentuser;
     private ProgressDialog mProgressDialog;
     private DatabaseReference mDatabaseReference;
-    private DatabaseReference mcheckinReference;
-    private String uid ;
+    private DatabaseReference mcheckoutReference;
+    private DatabaseReference mchekinReference;
+    private String uid,islogin ;
 
 
     @Override
@@ -71,7 +83,8 @@ public class CheckOutFragment extends Fragment {
         mProgressDialog = new ProgressDialog(getActivity());
         uid = mCurrentuser.getUid();
         mDatabaseReference = FirebaseDatabase.getInstance().getReference().child("Users").child(uid);
-        mcheckinReference = FirebaseDatabase.getInstance().getReference().child("Checkin").child(uid);
+        mcheckoutReference = FirebaseDatabase.getInstance().getReference().child("checkout").child(uid);
+        mchekinReference = FirebaseDatabase.getInstance().getReference();
 
         mDatabaseReference.keepSynced(true);
 
@@ -91,37 +104,51 @@ public class CheckOutFragment extends Fragment {
 
         today = DateFormat.getDateInstance().format(new Date());
 
-        if (!preferenceManager.getsudahcheckin()) {
-            //true
-            status = "notchecked";
-            snotifikasi = "You haven't checked yet";
-            sketnotifikasi =  "please go to the checkin page to check";
-            floatingActionButton.setVisibility(View.GONE);
-            notifikasi.setText(snotifikasi);
-            ketnotifikasi.setText(sketnotifikasi);
-        } else {
+        mDatabaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                islogin = dataSnapshot.child("checkIN").getValue().toString();
+                if (islogin.equalsIgnoreCase("false")) {
+                    //true
+                    status = "notchecked";
+                    snotifikasi = "You haven't checked yet";
+                    sketnotifikasi =  "please go to the checkin page to check";
+                    floatingActionButton.setVisibility(View.GONE);
+                    notifikasi.setText(snotifikasi);
+                    ketnotifikasi.setText(sketnotifikasi);
+                } else {
 
-            if (waktuskrng.getTimeInMillis() < waktumulaikerja.getTimeInMillis() || waktuskrng.getTimeInMillis() > waktuakhirkerja.getTimeInMillis()) {
-                //bisa check in
-                status = "checkout";
-                snotifikasi = "You haven't checked out";
-                sketnotifikasi = "You haven't checked yet, please click the button below to Check out";
-                floatingActionButton.setVisibility(View.VISIBLE);
-                notifikasi.setText(snotifikasi);
-                ketnotifikasi.setText(sketnotifikasi);
+                    if (waktuskrng.getTimeInMillis() < waktumulaikerja.getTimeInMillis() || waktuskrng.getTimeInMillis() > waktuakhirkerja.getTimeInMillis()) {
+                        //bisa check in
+                        status = "checkout";
+                        snotifikasi = "You haven't checked out";
+                        sketnotifikasi = "You haven't checked yet, please click the button below to Check out";
+                        floatingActionButton.setVisibility(View.VISIBLE);
+                        notifikasi.setText(snotifikasi);
+                        ketnotifikasi.setText(sketnotifikasi);
 
 
-            } else {
-                //gak bisa chekin
-                status = "cantcheckout";
-                snotifikasi = "Can't Chek Out";
-                sketnotifikasi = "cannot Check Out at this time because it is not yet time";
-                floatingActionButton.setVisibility(View.GONE);
-                notifikasi.setText(snotifikasi);
-                ketnotifikasi.setText(sketnotifikasi);
+                    } else {
+                        //gak bisa chekin
+                        status = "cantcheckout";
+                        snotifikasi = "Can't Chek Out";
+                        sketnotifikasi = "cannot Check Out at this time because it is not yet time";
+                        floatingActionButton.setVisibility(View.GONE);
+                        notifikasi.setText(snotifikasi);
+                        ketnotifikasi.setText(sketnotifikasi);
+                    }
+
+                }
             }
 
-        }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
+
         /*}else {
             status = "notyettime";
             snotifikasi = ""
@@ -150,7 +177,37 @@ public class CheckOutFragment extends Fragment {
 
     private void doCheckout() {
         if (status.equalsIgnoreCase("checkout")){
-            preferenceManager.setsudahChekin(false);
+            final String currenttime = DateFormat.getTimeInstance().format(new Date());
+            Map update = new HashMap();
+            update.put("uid", ""+uid);
+            update.put("time", ""+currenttime);
+            update.put("timestamp",ServerValue.TIMESTAMP);
+
+            mcheckoutReference.updateChildren(update).addOnCompleteListener(new OnCompleteListener() {
+                @Override
+                public void onComplete(@NonNull Task task) {
+
+                    Map deletecheckin = new HashMap();
+                    deletecheckin.put("Checkin/"+uid, null);
+                    mchekinReference.updateChildren(deletecheckin, new DatabaseReference.CompletionListener() {
+                        @Override
+                        public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                            mDatabaseReference.child("checkIN").setValue("false");
+                            preferenceManager.setsudahChekin(false);
+                            status = "notchecked";
+                            snotifikasi = "Checkout berhasil, terima kasih";
+                            sketnotifikasi =  "Sampai ketemu esok hari :)";
+                            floatingActionButton.setVisibility(View.GONE);
+                            notifikasi.setText(snotifikasi);
+                            ketnotifikasi.setText(sketnotifikasi);
+                            Toast.makeText(getActivity(), "Checkout berhasil, Terima Kasih", Toast.LENGTH_LONG);
+                        }
+                    });
+
+
+
+                }
+            });
 
         }
     }

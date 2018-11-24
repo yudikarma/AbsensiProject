@@ -3,19 +3,23 @@ package com.example.alfattah.absensiproject.Fragment_Dashboard_Staff;
 
 import android.Manifest;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -79,18 +83,18 @@ import static android.app.Activity.RESULT_OK;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class CheckinFragment extends Fragment  {
+public class CheckinFragment extends Fragment {
 
 
     public CheckinFragment() {
         // Required empty public constructor
     }
 
-    private TextView notifikasi,ketnotifikasi;
-
-    private PreferenceManager preferenceManager;
-    private Calendar waktuskrng, waktumulaikerja   ,waktuakhirkerja ;
-    String today, status,snotifikasi,sketnotifikasi;
+    private TextView notifikasi, ketnotifikasi;
+/*
+    private PreferenceManager preferenceManager;*/
+    private Calendar waktuskrng, waktumulaikerja, waktuakhirkerja;
+    String today, status, snotifikasi, sketnotifikasi;
     private FloatingActionButton floatingActionButton;
 
     private int REQUEST_IMAGE_CAPTURE = 1;
@@ -101,14 +105,12 @@ public class CheckinFragment extends Fragment  {
     private File photofile = null;
     private File thumb_file;
 
-    // Storage Firebase
-    private StorageReference mImageStorage;
 
     //TO GET ADDRESS FROM CURRENT LOCATION
     Geocoder geocoder;
     List<Address> addresses;
     String origin;
-    float latorigin,lngorigin;
+    float latorigin, lngorigin;
 
 
     //get lat lng from current location
@@ -120,11 +122,49 @@ public class CheckinFragment extends Fragment  {
     private ProgressDialog mProgressDialog;
     private DatabaseReference mDatabaseReference;
     private DatabaseReference mcheckinReference;
-    private String uid ;
+    private DatabaseReference mcheckoutReference;
+    private String uid;
     private LatLng latLng;
-    private double latitude,longitude;
+    private double latitude, longitude;
     private float kilometer;
     String distance;
+    public static final int LOCATION_UPDATE_MIN_DISTANCE = 10;
+    public static final int LOCATION_UPDATE_MIN_TIME = 5000;
+    private LocationManager mLocationManager;
+    double latitudedestination ;
+    double longitudedestination ;
+    double getmeter ;
+    String islogin ;
+
+    private LocationListener locationListener = new LocationListener() {
+        @Override
+        public void onLocationChanged(Location location) {
+            if (location != null) {
+                latitude = location.getLatitude();
+                longitude = location.getLongitude();
+
+                mLocationManager.removeUpdates(locationListener);
+
+            } else {
+                Log.i("my location :", "IS NULL");
+            }
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+
+        }
+    };
 
 
     @Override
@@ -137,7 +177,7 @@ public class CheckinFragment extends Fragment  {
 
         floatingActionButton = rootview.findViewById(R.id.fab_chekin);
 
-        preferenceManager  = new PreferenceManager(getActivity());
+/*        preferenceManager = new PreferenceManager(getActivity());*/
         mStorageReference = FirebaseStorage.getInstance().getReference();
         mCurrentuser = FirebaseAuth.getInstance().getCurrentUser();
         mProgressDialog = new ProgressDialog(getActivity());
@@ -146,8 +186,14 @@ public class CheckinFragment extends Fragment  {
         longitude = Double.parseDouble(null);*/
         mDatabaseReference = FirebaseDatabase.getInstance().getReference().child("Users").child(uid);
         mcheckinReference = FirebaseDatabase.getInstance().getReference().child("Checkin").child(uid);
+        mcheckoutReference = FirebaseDatabase.getInstance().getReference();
+
+
 
         mDatabaseReference.keepSynced(true);
+
+        mLocationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        getCurrentLocation();
 
         //waktu
         waktumulaikerja = Calendar.getInstance();
@@ -166,38 +212,51 @@ public class CheckinFragment extends Fragment  {
         today = DateFormat.getDateInstance().format(new Date());
 
         /*if (!(waktuskrng.getTimeInMillis() > waktuakhirkerja.getTimeInMillis() || waktuskrng.getTimeInMillis() < waktumulaikerja.getTimeInMillis())) {*/
-            if (preferenceManager.getsudahcheckin()) {
-                //true
-                status = "ischeked";
-                snotifikasi = "You have Checked";
-                sketnotifikasi = "Your current status has been checked. thank you";
-                floatingActionButton.setVisibility(View.GONE);
-                notifikasi.setText(snotifikasi);
-                ketnotifikasi.setText(sketnotifikasi);
-            } else {
-
-                if (waktuskrng.getTimeInMillis() > waktumulaikerja.getTimeInMillis() && waktuskrng.getTimeInMillis() < waktuakhirkerja.getTimeInMillis()) {
-                    //bisa check in
-                    status = "notyetcheckin";
-                    snotifikasi = "You haven't checked yet";
-                    sketnotifikasi = "You haven't checked yet, please click the button below to check";
-                    floatingActionButton.setVisibility(View.VISIBLE);
-                    notifikasi.setText(snotifikasi);
-                    ketnotifikasi.setText(sketnotifikasi);
-
-
-
-                } else {
-                    //gak bisa chekin
-                    status = "cantchekin";
-                    snotifikasi = "Can't Chek In";
-                    sketnotifikasi = "cannot check in at this time because it is not yet time";
+        /*islogin = "true";*/
+        mDatabaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                islogin = dataSnapshot.child("checkIN").getValue().toString();
+                Log.e("status login :", ""+islogin);
+                if (islogin.equals("true")) {
+                    //true
+                    status = "ischeked";
+                    snotifikasi = "You have Checked";
+                    sketnotifikasi = "Your current status has been checked. thank you";
                     floatingActionButton.setVisibility(View.GONE);
                     notifikasi.setText(snotifikasi);
                     ketnotifikasi.setText(sketnotifikasi);
+                } else {
+
+                    if (waktuskrng.getTimeInMillis() > waktumulaikerja.getTimeInMillis() && waktuskrng.getTimeInMillis() < waktuakhirkerja.getTimeInMillis()) {
+                        //bisa check in
+                        status = "notyetcheckin";
+                        snotifikasi = "You haven't checked yet";
+                        sketnotifikasi = "You haven't checked yet, please click the button below to check";
+                        floatingActionButton.setVisibility(View.VISIBLE);
+                        notifikasi.setText(snotifikasi);
+                        ketnotifikasi.setText(sketnotifikasi);
+
+
+                    } else {
+                        //gak bisa chekin
+                        status = "cantchekin";
+                        snotifikasi = "Can't Chek In";
+                        sketnotifikasi = "cannot check in at this time because it is not yet time";
+                        floatingActionButton.setVisibility(View.GONE);
+                        notifikasi.setText(snotifikasi);
+                        ketnotifikasi.setText(sketnotifikasi);
+                    }
+
                 }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
+        });
+
         /*}else {
             status = "notyettime";
             snotifikasi = ""
@@ -207,12 +266,9 @@ public class CheckinFragment extends Fragment  {
 
         }*/
 
-        Log.i("chek notif", ""+snotifikasi+" "+sketnotifikasi);
+        Log.i("chek notif", "" + snotifikasi + " " + sketnotifikasi);
         notifikasi.setText(snotifikasi);
         ketnotifikasi.setText(sketnotifikasi);
-
-
-
 
 
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
@@ -223,10 +279,48 @@ public class CheckinFragment extends Fragment  {
         });
 
 
-
-
-
         return rootview;
+    }
+
+    private void getCurrentLocation() {
+        boolean isGPSEnabled = mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        boolean isNetworkEnabled = mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+
+        Location location = null;
+        if (!(isGPSEnabled || isNetworkEnabled))
+            /* Snackbar.make(mMapView, R.string.error_location_provider, Snackbar.LENGTH_INDEFINITE).show();*/
+            Toast.makeText(getActivity(), "Error location provider" , Toast.LENGTH_SHORT);
+
+        else {
+            if (isNetworkEnabled) {
+                if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    // TODO: Consider calling
+                    //    ActivityCompat#requestPermissions
+                    // here to request the missing permissions, and then overriding
+                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                    //                                          int[] grantResults)
+                    // to handle the case where the user grants the permission. See the documentation
+                    // for ActivityCompat#requestPermissions for more details.
+                    return;
+                }
+                mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+                        LOCATION_UPDATE_MIN_TIME, LOCATION_UPDATE_MIN_DISTANCE, locationListener);
+                location = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            }
+
+            if (isGPSEnabled) {
+                mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                        LOCATION_UPDATE_MIN_TIME, LOCATION_UPDATE_MIN_DISTANCE, locationListener);
+                location = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            }
+        }
+        if (location != null) {
+            /*Logger.d(String.format("getCurrentLocation(%f, %f)", location.getLatitude(),
+                    location.getLongitude()));*/
+            latitude = location.getLatitude();
+            longitude = location.getLongitude();/*
+            drawMarker(location);*/
+        }
     }
 
     private void doCheckin() {
@@ -299,17 +393,129 @@ public class CheckinFragment extends Fragment  {
         //Jika Request nya ImageCapture(Camera) dan user menekan OK (Selesai mengambil foto)
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
 
-            getlocation();
+            mProgressDialog.setTitle("Upload Selfie chek in");
+            mProgressDialog.setMessage("we wil try to upload your images");
+            mProgressDialog.setCanceledOnTouchOutside(false);
+            mProgressDialog.show();
+
             FirebaseDatabase.getInstance().getReference().child("DataPerusahaan").addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    float latitudedestination = (float) dataSnapshot.child("latitude").getValue();
-                    float longitudedestination = (float) dataSnapshot.child("longitude").getValue();
+                     latitudedestination = Double.parseDouble(dataSnapshot.child("latitude").getValue().toString());
+                     longitudedestination = Double.parseDouble(dataSnapshot.child("longitude").getValue().toString());
                     float results[] = new float[10];
-                    Location.distanceBetween(latorigin, lngorigin, latitudedestination, longitudedestination, results);
+                    Location.distanceBetween(latitude, longitude, latitudedestination, longitudedestination, results);
                     distance = ""+results[0];
 
-                    Toast.makeText(getActivity(), ""+distance, Toast.LENGTH_SHORT).show();
+
+                   /* double distancetest = Double.parseDouble(distance)/1000;*/
+                     getmeter = Math.floor(Double.parseDouble(distance));
+                    Toast.makeText(getActivity(), ""+getmeter, Toast.LENGTH_SHORT).show();
+                    if (getmeter <= 300){
+                        if (imageUri != null){
+                            try {
+
+                                //Kompress File asal kedalam File Baru dengan ukuran lebih ringan
+                                File newsfile = new Compressor(getActivity())
+                                        .compressToFile(photofile);
+
+                                //Mendapatkan Uri file baru setelah di kompress
+                                newsImageUri = Uri.fromFile(newsfile);
+
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            //Mendapatkan hasil generate  ID
+                            final String push_id = mcheckinReference.getKey();
+
+
+                            //Path penyimpanan FILE Pada FIrebas Storage
+                            final StorageReference filepath = mStorageReference.child("chekin_selfie").child(push_id+uid+ ".jpg");
+                            filepath.putFile(newsImageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                                    if (task.isSuccessful()) {
+                                        //Toast.makeText(SettingActivity.this,"working",Toast.LENGTH_LONG).show();
+
+                                        filepath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                            @Override
+                                            public void onSuccess(Uri uri) {
+
+                                                /*final  Uri downloadUri = uri;*/
+                                                final String currenttime = DateFormat.getTimeInstance().format(new Date());
+                                                final String sdownloadUri = uri.toString();
+                                                Map update_hasmap = new HashMap();
+                                                update_hasmap.put("image",""+sdownloadUri);
+                                                update_hasmap.put("uid",""+ uid);
+                                                update_hasmap.put("latitude",""+ latitude);
+                                                update_hasmap.put("longitude",""+ longitude);
+                                                update_hasmap.put("distance",""+ getmeter);
+                                                update_hasmap.put("timestamp",ServerValue.TIMESTAMP);
+                                                update_hasmap.put("time", ""+currenttime);
+
+
+
+
+                                                mcheckinReference.updateChildren(update_hasmap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                    @Override
+                                                    public void onComplete(@NonNull final Task<Void> task) {
+                                                        if (task.isSuccessful()) {
+
+                                                            Map deletecheckout = new HashMap();
+                                                            deletecheckout.put("checkout/"+uid, null);
+
+                                                            mcheckoutReference.updateChildren(deletecheckout, new DatabaseReference.CompletionListener() {
+                                                                @Override
+                                                                public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                                                                    mProgressDialog.dismiss();
+                                                                    /*preferenceManager.setsudahChekin(true);*/
+                                                                    mDatabaseReference.child("checkIN").setValue("true");
+                                                                    status = "ischeked";
+                                                                    snotifikasi = "You have Checked";
+                                                                    sketnotifikasi = "Your current status has been checked. thank you";
+                                                                    floatingActionButton.setVisibility(View.GONE);
+                                                                    notifikasi.setText(snotifikasi);
+                                                                    ketnotifikasi.setText(sketnotifikasi);
+
+                                                                    Toast.makeText(getActivity(), "Succes Melakukan Check in, Terima Kasih", Toast.LENGTH_LONG).show();
+
+                                                                }
+                                                            });
+
+
+
+                                                        }
+                                                        else {
+                                                            mProgressDialog.dismiss();
+                                                            Toast.makeText(getActivity(), "Gagal melakukan check in, please try again", Toast.LENGTH_LONG).show();
+                                                        }
+                                                    }
+                                                });
+
+                                            }
+                                        }) ;
+
+                                    } else {
+                                        mProgressDialog.dismiss();
+                                        Toast.makeText(getActivity(), "Error upload", Toast.LENGTH_LONG).show();
+                                        mProgressDialog.dismiss();
+                                    }
+
+                                }
+                            });
+
+
+
+                        }
+                    }else {
+                        mProgressDialog.dismiss();
+                        Toast.makeText(getActivity(), "Sorry, you are out of Range", Toast.LENGTH_SHORT).show();
+                    }
+/*                    Toast.makeText(getActivity(), ""+distance, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), ""+distancetest, Toast.LENGTH_SHORT).show();
+                    Log.i("distance", ""+distance);
+                    Log.i("distance", ""+distancetest);*/
+
 
 
 
@@ -321,37 +527,14 @@ public class CheckinFragment extends Fragment  {
                 }
             });
             } else {
+            mProgressDialog.dismiss();
                 Toast.makeText(getActivity(), "URI IS NULL", Toast.LENGTH_LONG).show();
             }
 
         }
 
 
-    //CET LOCATION LATIDUTE LONGITUDE CURRENT LOCATION
-    private void getlocation() {
-        if (ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        } else {
-            Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 
-            if (location != null){
-                float latcurrent = (float) location.getLatitude();
-                float lngcurrent = (float) location.getLongitude();
-                latorigin = latcurrent;
-                lngorigin = lngcurrent;
-
-            }else {
-                Toast.makeText(getActivity(),"Cant not get latitude longitude from current location",Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
 
 
 

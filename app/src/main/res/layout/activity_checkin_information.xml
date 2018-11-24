@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorWhitemuda"
+    android:orientation="vertical">
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/profil_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/birumuda"
+        app:titleTextColor="@color/colorWhitemuda"
+        app:title="Informasi Check in"
+
+        >
+
+    </android.support.v7.widget.Toolbar>
+
+ <ScrollView
+     android:layout_width="match_parent"
+     android:layout_height="match_parent">
+     <LinearLayout
+         android:layout_width="match_parent"
+         android:layout_height="match_parent"
+         android:orientation="vertical">
+     <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
+         android:id="@+id/profil_image"
+         android:layout_width="130dp"
+
+         android:layout_height="130dp"
+         android:layout_alignParentTop="true"
+         android:layout_centerHorizontal="true"
+         android:layout_marginTop="5dp"
+         android:src="@drawable/default_avatar"
+         android:layout_gravity="center_horizontal"
+         app:civ_border_color="@color/birumuda"
+         app:civ_border_width="2dp" />
+
+     <TextView
+         android:id="@+id/checkin_displayname"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_alignParentTop="true"
+         android:layout_centerHorizontal="true"
+         android:layout_marginTop="3dp"
+         android:layout_gravity="center_horizontal"
+         android:text="Danny McCallister"
+
+         android:textColor="@android:color/black"
+         android:textSize="24sp"
+         android:textStyle="bold" />
+     <ImageView
+         android:id="@+id/checkin_selfie"
+         android:layout_width="400dp"
+         android:layout_height="300dp"
+         app:srcCompat="@drawable/image_9" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_margin="1dp"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <TextView
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Latitude       :  "
+                android:textColor="@color/hitamflat"
+                android:layout_marginStart="10dp"
+                android:textSize="14sp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/checkin_latitude"
+                android:text="5.5443836"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_gravity="end"
+            android:layout_height="wrap_content">
+            <TextView
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Longitude   :  "
+                android:textColor="@color/hitamflat"
+                android:layout_marginStart="10dp"
+                android:textSize="14sp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/checkin_longitude"
+                android:text="95.3234944"/>
+        </LinearLayout>
+    </LinearLayout>
+
+         <LinearLayout
+             android:layout_width="match_parent"
+             android:layout_margin="1dp"
+             android:layout_height="wrap_content">
+
+                 <TextView
+
+                     android:layout_width="wrap_content"
+                     android:layout_height="wrap_content"
+                     android:text="Time             :  "
+                     android:textColor="@color/hitamflat"
+                     android:layout_marginStart="10dp"
+                     android:textSize="14sp" />
+                 <TextView
+                     android:layout_width="wrap_content"
+                     android:layout_height="wrap_content"
+                     android:id="@+id/checkin_time"
+                     android:text="08.45.53"/>
+
+
+         </LinearLayout>
+
+         <LinearLayout
+             android:layout_width="match_parent"
+             android:layout_margin="1dp"
+             android:layout_height="wrap_content">
+
+             <TextView
+
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:text="Time Ago    :  "
+                 android:textColor="@color/hitamflat"
+                 android:layout_marginStart="10dp"
+                 android:textSize="14sp" />
+             <TextView
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:id="@+id/checkin_timestamp"
+                 android:text="60 minutes ago"/>
+
+
+         </LinearLayout>
+
+         <LinearLayout
+             android:layout_width="match_parent"
+             android:layout_margin="1dp"
+             android:layout_height="wrap_content">
+
+             <TextView
+
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:text="Distance     :  "
+                 android:textColor="@color/hitamflat"
+                 android:layout_marginStart="10dp"
+                 android:textSize="14sp" />
+             <TextView
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:id="@+id/checkin_distance"
+                 android:text="14 Meters"/>
+
+
+         </LinearLayout>
+
+
+
+
+
+
+     <Button
+         android:id="@+id/checkin_btn_back"
+         android:layout_width="180dp"
+         android:layout_height="34dp"
+         android:layout_alignParentBottom="true"
+         android:layout_centerHorizontal="true"
+         android:layout_marginBottom="11dp"
+         android:layout_marginTop="30dp"
+         android:layout_gravity="center_horizontal"
+
+         android:background="@drawable/buttoncapsul"
+         android:text="Back To Dashboard" />
+
+
+     </LinearLayout>
+
+ </ScrollView>
+</LinearLayout>

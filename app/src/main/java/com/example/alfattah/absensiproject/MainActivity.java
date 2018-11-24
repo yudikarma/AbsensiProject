@@ -261,14 +261,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     // Hide the Status Bar
                     FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
                     fragmentTransaction.replace(R.id.frame_main, inputDataPerusahaanFragment);
-                    fragmentTransaction.commitAllowingStateLoss();
+                    fragmentTransaction.addToBackStack(null);
+                    fragmentTransaction.commit();
 
 
 
                 }else {
                     FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
                     fragmentTransaction.replace(R.id.frame_main, dashboardMonitoringFragment);
-                    fragmentTransaction.commit();
+                    fragmentTransaction.commitAllowingStateLoss();
                     Log.i(" database Ini tersedia", "DataPerusahaan ");
                 }
 

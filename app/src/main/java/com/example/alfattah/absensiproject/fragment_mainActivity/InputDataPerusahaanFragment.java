@@ -1,6 +1,7 @@
 package com.example.alfattah.absensiproject.fragment_mainActivity;
 
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -56,9 +57,6 @@ import static android.app.Activity.RESULT_OK;
 public class InputDataPerusahaanFragment extends Fragment {
 
 
-    public InputDataPerusahaanFragment() {
-        // Required empty public constructor
-    }
     private BottomSheetBehavior bottomSheetBehavior;
     private Place place_Picker;
     private DatabaseReference DataPerusahaan;
@@ -70,8 +68,10 @@ public class InputDataPerusahaanFragment extends Fragment {
     LatLng latLng2;
     float lat;
     float longitude;
+    private  Context context;
 
-    public MainActivity activity;
+    private InputDataPerusahaanFragment inputDataPerusahaanFragment;
+
 
 
 
@@ -80,6 +80,12 @@ public class InputDataPerusahaanFragment extends Fragment {
     AppCompatRatingBar ratingBar;
     TextView txtrating,txtlatlng,txtaddresplace,txtphoneplaces,txtjamoperasiplace;
     String scmpnType,scmpnName,scmpnPhone,scmpnEmail,scmpnAddress,sratingBar,stxtrating,stxtlatlng,stxtaddresplace,stxtphoneplaces,stxtjamoperasiplace,scmpnwebsite;
+
+
+    public InputDataPerusahaanFragment() {
+        // Required empty public constructor
+    }
+
 
 
     @Override
@@ -97,6 +103,7 @@ public class InputDataPerusahaanFragment extends Fragment {
         ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         setHasOptionsMenu(true);
         DataPerusahaan = FirebaseDatabase.getInstance().getReference();
+
 
 
 
@@ -383,14 +390,15 @@ public class InputDataPerusahaanFragment extends Fragment {
                 @Override
                 public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
                     if (databaseError == null){
-                        Toast.makeText(getContext(), "Berhasil menyimpan Data perusahaan", Toast.LENGTH_LONG).show();
-                        Toast.makeText(getContext(), "Anda dapat memonitoring absen karyawan dari halaman dashboard..", Toast.LENGTH_LONG).show();
+                        /*Toast.makeText(getActivity(), "Berhasil menyimpan Data perusahaan", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(), "Anda dapat memonitoring absen karyawan dari halaman dashboard..", Toast.LENGTH_LONG).show();*//*
                         /// Background operation returns
 
                         Intent intent = new Intent(getActivity(),MainActivity.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        *//*intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);*//*
                         startActivity(intent);
-                        getActivity().finish();
+                        getActivity().finish();*/
+                        getActivity().getSupportFragmentManager().popBackStack();
 
                     }
                 }
@@ -405,5 +413,6 @@ public class InputDataPerusahaanFragment extends Fragment {
 
 
     }
+
 
 }

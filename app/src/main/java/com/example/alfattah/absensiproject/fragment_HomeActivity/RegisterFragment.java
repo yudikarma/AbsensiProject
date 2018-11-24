@@ -213,7 +213,7 @@ public class RegisterFragment extends Fragment {
                     userMap.put("thumb_image", "default");
                     userMap.put("location", "default");
                     userMap.put("locationLatLng", "default");
-                    userMap.put("checkIN", "true");
+                    userMap.put("checkIN", "false");
                     userMap.put("checkInTime", "default");
                     userMap.put("checkOutTime", "default");
                     userMap.put("image", "default");
