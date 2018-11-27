@@ -2,7 +2,9 @@ package com.example.alfattah.absensiproject.fragment_mainActivity;
 
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
@@ -33,11 +35,12 @@ import com.google.firebase.database.ValueEventListener;
 import net.sharewire.googlemapsclustering.ClusterItem;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class DashboardMonitoringFragment extends Fragment implements OnMapReadyCallback,ClusterItem {
+public class DashboardMonitoringFragment extends Fragment implements OnMapReadyCallback {
 
 
     public DashboardMonitoringFragment() {
@@ -56,8 +59,14 @@ public class DashboardMonitoringFragment extends Fragment implements OnMapReadyC
     double lng ;
     String time ;
     float zoom;
+    private GoogleMap googleMap;
+    private MarkerOptions options = new MarkerOptions();
+    private ArrayList<LatLng> latlngs = new ArrayList<>();
     private LatLng markerlocation;
     MarkerOptions marker;
+    private String title;
+    private String uid ;
+    private String nama;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -65,11 +74,19 @@ public class DashboardMonitoringFragment extends Fragment implements OnMapReadyC
         View rootview = inflater.inflate(R.layout.fragment_dashboard_monitoring, container, false);
         listUserCheckINFragment = new ListUserCheckINFragment();
         listUserCheckINFragment = new ListUserCheckINFragment();
-        viewPager_monitoring = rootview.findViewById(R.id.viewpager_monitoring);
-
         //Pageviewadapter
-        dashboardPageviewAdapter = new AdapterMonitoringDashboard(getActivity().getSupportFragmentManager());
+        dashboardPageviewAdapter = new AdapterMonitoringDashboard(getChildFragmentManager());
+        viewPager_monitoring = rootview.findViewById(R.id.viewpager_monitoring);
         viewPager_monitoring.setAdapter(dashboardPageviewAdapter);
+
+        //Tablayout
+        TabLayout tabLayout = rootview.findViewById(R.id.tabs);
+
+        viewPager_monitoring.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+        tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(viewPager_monitoring));
+
+
+       /* viewPager_monitoring.setAdapter(dashboardPageviewAdapter);*//*
         viewPager_monitoring.setCurrentItem(0);
 
         viewPager_monitoring.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -88,7 +105,7 @@ public class DashboardMonitoringFragment extends Fragment implements OnMapReadyC
             public void onPageScrollStateChanged(int state) {
 
             }
-        });
+        });*/
 
         // Gets the MapView from the XML layout and creates it
         mapView = (MapView) rootview.findViewById(R.id.mapview_monitoring);
@@ -98,7 +115,7 @@ public class DashboardMonitoringFragment extends Fragment implements OnMapReadyC
         mapView.getMapAsync(this);
 
 
-        MapsInitializer.initialize(this.getActivity());
+        MapsInitializer.initialize(getActivity());
         // Updates the location and zoom of the MapView
 
 
@@ -106,7 +123,7 @@ public class DashboardMonitoringFragment extends Fragment implements OnMapReadyC
         return rootview;
     }
 
-    private void settabs(int position) {
+    /*private void settabs(int position) {
         switch (position){
             case 0:
                 viewPager_monitoring.setCurrentItem(0);
@@ -114,16 +131,15 @@ public class DashboardMonitoringFragment extends Fragment implements OnMapReadyC
             case 1:
                 viewPager_monitoring.setCurrentItem(1);
                 break;
-                default:
-                    break;
+            default:
+                break;
         }
-    }
+    }*/
 
     @Override
     public void onMapReady(final GoogleMap googleMap) {
         // latitude and longitude
-        final double latitude = 17.385044;
-        final double longitude = 78.486671;
+
         FirebaseDatabase.getInstance().getReference().addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -132,42 +148,41 @@ public class DashboardMonitoringFragment extends Fragment implements OnMapReadyC
                 for (DataSnapshot datasnapshotchekinchildren : checkinchildren){
                     ChekinModel chekinModel = datasnapshotchekinchildren.getValue(ChekinModel.class);
                     Log.e("latitude :", chekinModel.getLatitude());
-                    listlatitude.add(chekinModel.getLatitude());
+                    /*listlatitude.add(chekinModel.getLatitude());*/
                     // create marker
                     lat = Double.parseDouble(chekinModel.getLatitude());
-                    lng = Double.parseDouble(chekinModel.getLatitude());
-                    String title = chekinModel.getTime();
-                     /*zoom = googleMap.getCameraPosition().zoom;*/
+                    lng = Double.parseDouble(chekinModel.getLongitude());
+                     title = chekinModel.getTime();
+                    uid = chekinModel.getUid();
+                    nama = chekinModel.getNama();
+
+                    latlngs.add(new LatLng(lat,lng));
+                    for (LatLng points : latlngs){
+                        options.position(points);
+                        options.title(""+nama+" at : "+title);
+                        options.icon(BitmapDescriptorFactory
+                                .defaultMarker(BitmapDescriptorFactory.HUE_RED));
+
+                        googleMap.addMarker(options);
+
+                    }
+                    CameraPosition cameraPosition = new CameraPosition.Builder()
+                            .target(new LatLng(lat, lng)).zoom(15).build();
+                    googleMap.animateCamera(CameraUpdateFactory
+                            .newCameraPosition(cameraPosition));
+
+                    MapsInitializer.initialize(Objects.requireNonNull(getActivity()));
+                    mapView.onResume();
 
 
-                    marker = new MarkerOptions().position(
-                            new LatLng(lat, lng)).title(title);
 
-                    // Changing marker icon
-                    marker.icon(BitmapDescriptorFactory
-                            .defaultMarker(BitmapDescriptorFactory.HUE_RED));
 
-                    // adding marker
-                    googleMap.addMarker(marker);
+
 
 
 
 
                 }
-                CameraPosition cameraPosition = new CameraPosition.Builder()
-                        .target(new LatLng(lat,lng))
-                        .zoom(20)
-                        .bearing(90)
-                        .tilt(30)
-                        .build();
-                googleMap.setMinZoomPreference(6f);
-                googleMap.setMaxZoomPreference(20f);
-                googleMap.animateCamera(CameraUpdateFactory
-                        .newCameraPosition(cameraPosition));
-
-                mapView.onResume();
-
-
 
 
             }
@@ -177,14 +192,6 @@ public class DashboardMonitoringFragment extends Fragment implements OnMapReadyC
 
             }
         });
-
-        mapView.onResume();
-        /*for (int i = 0; i < listlatitude.size(); i++) {
-            Log.e("latitude after loop :", ""+ listlatitude.get(i));
-
-        }
-*/
-
 
 
     }
@@ -226,24 +233,8 @@ public class DashboardMonitoringFragment extends Fragment implements OnMapReadyC
     }
 
     @Override
-    public double getLatitude() {
-        return 0;
-    }
+    public void onStart() {
+        super.onStart();
 
-    @Override
-    public double getLongitude() {
-        return 0;
-    }
-
-    @Nullable
-    @Override
-    public String getTitle() {
-        return null;
-    }
-
-    @Nullable
-    @Override
-    public String getSnippet() {
-        return null;
     }
 }

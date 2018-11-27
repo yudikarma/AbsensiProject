@@ -2,6 +2,7 @@ package com.example.alfattah.absensiproject.Fragment_Dashboard_Staff;
 
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -16,6 +17,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.alfattah.absensiproject.ChekoutActionActivity;
+import com.example.alfattah.absensiproject.MainActivity;
 import com.example.alfattah.absensiproject.R;
 import com.example.alfattah.absensiproject.utils.PreferenceManager;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -177,38 +180,11 @@ public class CheckOutFragment extends Fragment {
 
     private void doCheckout() {
         if (status.equalsIgnoreCase("checkout")){
-            final String currenttime = DateFormat.getTimeInstance().format(new Date());
-            Map update = new HashMap();
-            update.put("uid", ""+uid);
-            update.put("time", ""+currenttime);
-            update.put("timestamp",ServerValue.TIMESTAMP);
+            Intent intent = new Intent(getActivity(),ChekoutActionActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
-            mcheckoutReference.updateChildren(update).addOnCompleteListener(new OnCompleteListener() {
-                @Override
-                public void onComplete(@NonNull Task task) {
-
-                    Map deletecheckin = new HashMap();
-                    deletecheckin.put("Checkin/"+uid, null);
-                    mchekinReference.updateChildren(deletecheckin, new DatabaseReference.CompletionListener() {
-                        @Override
-                        public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
-                            mDatabaseReference.child("checkIN").setValue("false");
-                            preferenceManager.setsudahChekin(false);
-                            status = "notchecked";
-                            snotifikasi = "Checkout berhasil, terima kasih";
-                            sketnotifikasi =  "Sampai ketemu esok hari :)";
-                            floatingActionButton.setVisibility(View.GONE);
-                            notifikasi.setText(snotifikasi);
-                            ketnotifikasi.setText(sketnotifikasi);
-                            Toast.makeText(getActivity(), "Checkout berhasil, Terima Kasih", Toast.LENGTH_LONG);
-                        }
-                    });
-
-
-
-                }
-            });
-
+            startActivity(intent);
+            getActivity().finish();
         }
     }
 

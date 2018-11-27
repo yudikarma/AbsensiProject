@@ -86,13 +86,15 @@ import static android.app.Activity.RESULT_OK;
 public class CheckinFragment extends Fragment {
 
 
+    private String nama;
+
     public CheckinFragment() {
         // Required empty public constructor
     }
 
     private TextView notifikasi, ketnotifikasi;
-/*
-    private PreferenceManager preferenceManager;*/
+    /*
+        private PreferenceManager preferenceManager;*/
     private Calendar waktuskrng, waktumulaikerja, waktuakhirkerja;
     String today, status, snotifikasi, sketnotifikasi;
     private FloatingActionButton floatingActionButton;
@@ -177,7 +179,7 @@ public class CheckinFragment extends Fragment {
 
         floatingActionButton = rootview.findViewById(R.id.fab_chekin);
 
-/*        preferenceManager = new PreferenceManager(getActivity());*/
+        /*        preferenceManager = new PreferenceManager(getActivity());*/
         mStorageReference = FirebaseStorage.getInstance().getReference();
         mCurrentuser = FirebaseAuth.getInstance().getCurrentUser();
         mProgressDialog = new ProgressDialog(getActivity());
@@ -185,6 +187,17 @@ public class CheckinFragment extends Fragment {
         /*latitude = Double.parseDouble(null);
         longitude = Double.parseDouble(null);*/
         mDatabaseReference = FirebaseDatabase.getInstance().getReference().child("Users").child(uid);
+        mDatabaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                nama = ""+dataSnapshot.child("nama").getValue().toString();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
         mcheckinReference = FirebaseDatabase.getInstance().getReference().child("Checkin").child(uid);
         mcheckoutReference = FirebaseDatabase.getInstance().getReference();
 
@@ -198,12 +211,12 @@ public class CheckinFragment extends Fragment {
         //waktu
         waktumulaikerja = Calendar.getInstance();
         waktumulaikerja.setTimeInMillis(System.currentTimeMillis());
-        waktumulaikerja.set(Calendar.HOUR_OF_DAY, 7);
+        waktumulaikerja.set(Calendar.HOUR_OF_DAY, 8);
         waktumulaikerja.set(Calendar.MINUTE, 0);
 
         waktuakhirkerja = Calendar.getInstance();
         waktuakhirkerja.setTimeInMillis(System.currentTimeMillis());
-        waktuakhirkerja.set(Calendar.HOUR_OF_DAY, 19);
+        waktuakhirkerja.set(Calendar.HOUR_OF_DAY, 17);
         waktuakhirkerja.set(Calendar.MINUTE, 0);
 
         waktuskrng = Calendar.getInstance();
@@ -336,49 +349,49 @@ public class CheckinFragment extends Fragment {
         }
         if (status.equalsIgnoreCase("notyetcheckin")){
             //CHEK PERMISSION ACCES CAMERA
-                if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA)
-                        == PackageManager.PERMISSION_DENIED) {
+            if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA)
+                    == PackageManager.PERMISSION_DENIED) {
 
-                    //Meminta Akses Camera
-                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CAMERA}, REQUEST_IMAGE_CAPTURE);
+                //Meminta Akses Camera
+                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CAMERA}, REQUEST_IMAGE_CAPTURE);
 
-                }
-                //CHEK Permission MENYIMPAN FILE (Storage)
-                else if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                        == PackageManager.PERMISSION_DENIED) {
+            }
+            //CHEK Permission MENYIMPAN FILE (Storage)
+            else if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_DENIED) {
 
-                    //MEMINTA ACCES
-                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_IMAGE_CAPTURE);
-                } else {
-
-
-                    /* ==========Jika AKses diberikan, maka penggil Intent Camera =========*/
-                    Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
-
-                        //Generate Name
-                        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-                        photofile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), timeStamp + "anu.jpg");
-
-                        //Chek photofile tidak null;
-                        if (photofile != null) {
-
-                            //Mendapatkan Alamat URi dari foto File
-                            imageUri = Uri.fromFile(photofile);
-
-                            //Mengirim ALamat Uri
-                            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-
-                            //Memanggil Activity Onresult dari Camera Intent
-                            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+                //MEMINTA ACCES
+                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_IMAGE_CAPTURE);
+            } else {
 
 
-                        } else {
-                            Toast.makeText(getActivity(), "PHOTO FILE NULL", Toast.LENGTH_LONG).show();
-                        }
+                /* ==========Jika AKses diberikan, maka penggil Intent Camera =========*/
+                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
 
+                    //Generate Name
+                    String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+                    photofile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), timeStamp + "anu.jpg");
+
+                    //Chek photofile tidak null;
+                    if (photofile != null) {
+
+                        //Mendapatkan Alamat URi dari foto File
+                        imageUri = Uri.fromFile(photofile);
+
+                        //Mengirim ALamat Uri
+                        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+
+                        //Memanggil Activity Onresult dari Camera Intent
+                        startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+
+
+                    } else {
+                        Toast.makeText(getActivity(), "PHOTO FILE NULL", Toast.LENGTH_LONG).show();
                     }
+
                 }
+            }
 
 
 
@@ -401,17 +414,17 @@ public class CheckinFragment extends Fragment {
             FirebaseDatabase.getInstance().getReference().child("DataPerusahaan").addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                     latitudedestination = Double.parseDouble(dataSnapshot.child("latitude").getValue().toString());
-                     longitudedestination = Double.parseDouble(dataSnapshot.child("longitude").getValue().toString());
+                    latitudedestination = Double.parseDouble(dataSnapshot.child("latitude").getValue().toString());
+                    longitudedestination = Double.parseDouble(dataSnapshot.child("longitude").getValue().toString());
                     float results[] = new float[10];
                     Location.distanceBetween(latitude, longitude, latitudedestination, longitudedestination, results);
                     distance = ""+results[0];
 
 
-                   /* double distancetest = Double.parseDouble(distance)/1000;*/
-                     getmeter = Math.floor(Double.parseDouble(distance));
+                    /* double distancetest = Double.parseDouble(distance)/1000;*/
+                    getmeter = Math.floor(Double.parseDouble(distance));
                     Toast.makeText(getActivity(), ""+getmeter, Toast.LENGTH_SHORT).show();
-                    if (getmeter <= 300){
+                    if (getmeter <= 100){
                         if (imageUri != null){
                             try {
 
@@ -447,6 +460,7 @@ public class CheckinFragment extends Fragment {
                                                 Map update_hasmap = new HashMap();
                                                 update_hasmap.put("image",""+sdownloadUri);
                                                 update_hasmap.put("uid",""+ uid);
+                                                update_hasmap.put("nama",""+ nama);
                                                 update_hasmap.put("latitude",""+ latitude);
                                                 update_hasmap.put("longitude",""+ longitude);
                                                 update_hasmap.put("distance",""+ getmeter);
@@ -526,12 +540,12 @@ public class CheckinFragment extends Fragment {
 
                 }
             });
-            } else {
+        } else {
             mProgressDialog.dismiss();
-                Toast.makeText(getActivity(), "URI IS NULL", Toast.LENGTH_LONG).show();
-            }
-
+            Toast.makeText(getActivity(), "URI IS NULL", Toast.LENGTH_LONG).show();
         }
+
+    }
 
 
 

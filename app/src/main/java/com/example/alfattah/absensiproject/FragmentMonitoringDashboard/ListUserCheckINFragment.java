@@ -76,48 +76,57 @@ public class ListUserCheckINFragment extends Fragment {
                 .setQuery(query, ChekinModel.class)
                 .setLifecycleOwner(getActivity())
                 .build();
-        adapter = new FirebaseRecyclerAdapter<ChekinModel, UserviewHolder>(options) {
-            @Override
-            protected void onBindViewHolder(@NonNull final UserviewHolder holder, int position, @NonNull ChekinModel model) {
+        if (getActivity() != null){
+            adapter = new FirebaseRecyclerAdapter<ChekinModel, UserviewHolder>(options) {
+                @Override
+                protected void onBindViewHolder(@NonNull final UserviewHolder holder, int position, @NonNull ChekinModel model) {
 
-                holder.settime(model.getTime());
-                holder.settimestamp(model.getDistance());
-                final String uid = model.getUid();
-                FirebaseDatabase.getInstance().getReference().child("Users").child(uid).addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        holder.setNama(dataSnapshot.child("nama").getValue().toString());
-                        holder.setMcCircleImageView(dataSnapshot.child("image").getValue().toString());
-
-                        holder.mView.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-
-                                Intent intent = new Intent(getActivity(), CheckinInformationActivity.class);
-                                intent.putExtra("uid", uid);
-                                startActivity(intent);
-
+                    holder.settime(model.getTime());
+                    holder.settimestamp(model.getDistance());
+                    final String uid = model.getUid();
+                    FirebaseDatabase.getInstance().getReference().child("Users").child(uid).addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            holder.setNama(dataSnapshot.child("nama").getValue().toString());
+                            String imageuri = dataSnapshot.child("image").getValue().toString();
+                            if (!imageuri.equals("image")){
+                                holder.setMcCircleImageView(imageuri);
+                            }else {
+                                /*holder.setMcCircleImageView(null);*/
                             }
-                        });
-                    }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                            holder.mView.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
 
-                    }
-                });
+                                    Intent intent = new Intent(getActivity(), CheckinInformationActivity.class);
+                                    intent.putExtra("uid", uid);
+                                    startActivity(intent);
 
-            }
+                                }
+                            });
+                        }
 
-            @NonNull
-            @Override
-            public UserviewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.user_singgle_layout, parent,false);
-             return new UserviewHolder(view);
-            }
-        };
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
 
-        recyclerView.setAdapter(adapter);
+                        }
+                    });
+
+                }
+
+                @NonNull
+                @Override
+                public UserviewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+                    View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.user_singgle_layout, parent,false);
+                    return new UserviewHolder(view);
+                }
+            };
+
+            recyclerView.setAdapter(adapter);
+        }else {
+
+        }
 
 
         return rootView;
@@ -154,7 +163,7 @@ public class ListUserCheckINFragment extends Fragment {
         }
         public  void setMcCircleImageView(final String img_uri){
             //Picasso.with(UsersActivity.this).load(img_uri).placeholder(R.drawable.user).into(mcCircleImageView);
-            if (!img_uri.equals("default") && img_uri!= null){
+            if (img_uri!= null){
                 Glide.with(getActivity()).load(img_uri).listener(new RequestListener<Drawable>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
@@ -167,6 +176,7 @@ public class ListUserCheckINFragment extends Fragment {
                     }
                 }).into(mcCircleImageView);
             }else {
+                mcCircleImageView.setImageResource(R.drawable.avatar);
 
             }
         }

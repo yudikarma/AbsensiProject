@@ -1,5 +1,7 @@
 package com.example.alfattah.absensiproject.Model;
 
+import android.support.v7.util.DiffUtil;
+
 public class ChekinModel {
     private String distance;
     private String download_uri;
@@ -8,10 +10,19 @@ public class ChekinModel {
     private String latitude;
     private String thumb_image;
     private String time;
+    private String nama;
     private long timestamp;
     private String uid;
 
     public ChekinModel(){}
+
+    public String getNama() {
+        return nama;
+    }
+
+    public void setNama(String nama) {
+        this.nama = nama;
+    }
 
     public String getDistance() {
         return distance;

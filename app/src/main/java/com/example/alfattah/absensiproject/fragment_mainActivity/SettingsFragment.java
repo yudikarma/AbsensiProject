@@ -1,17 +1,25 @@
 package com.example.alfattah.absensiproject.fragment_mainActivity;
 
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,6 +56,8 @@ import com.theartofdev.edmodo.cropper.CropImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -59,7 +69,7 @@ import static android.app.Activity.RESULT_OK;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class SettingsFragment extends Fragment {
+public class SettingsFragment extends AppCompatActivity {
 
 
     public SettingsFragment() {
@@ -85,7 +95,7 @@ public class SettingsFragment extends Fragment {
 
     //Firebase
     private StorageReference mStorageReference;
-    static final int REQUEST_IMAGE_CAPTURE = 1;
+    static final int REQUEST_IMAGE_CAPTURE = 2;
     private File imageFile = null;
     //VARIABEL UNTUK TAKE PICTURE
     private Uri imageUri;
@@ -94,31 +104,23 @@ public class SettingsFragment extends Fragment {
     private File thumb_file;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        final View view = inflater.inflate(R.layout.fragment_settings, container, false);
-        getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.fragment_settings);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        mCircleImageView = view.findViewById(R.id.circleImageViewdetail);
-        mDisplayname = view.findViewById(R.id.display_name_detail);
-        maddresprofil = view.findViewById(R.id.addres_profil);
-        email = view.findViewById(R.id.email_detail);
-        name = view.findViewById(R.id.name_detail);
-        jabatan = view.findViewById(R.id.jabatan_detail);
-        nip  = view.findViewById(R.id.NIP_detail);
-        rule = view.findViewById(R.id.Rule);
-        nohp_setting = view.findViewById(R.id.nohp_detail);
-        address_setting = view.findViewById(R.id.address_detail);
+        mCircleImageView = findViewById(R.id.circleImageViewdetail);
+        mDisplayname = findViewById(R.id.display_name_detail);
+        maddresprofil = findViewById(R.id.addres_profil);
+        email = findViewById(R.id.email_detail);
+        name = findViewById(R.id.name_detail);
+        jabatan = findViewById(R.id.jabatan_detail);
+        nip  =  findViewById(R.id.NIP_detail);
+        rule =  findViewById(R.id.Rule);
+        nohp_setting =  findViewById(R.id.nohp_detail);
+        address_setting = findViewById(R.id.address_detail);
 
-        mProgressDialog = new ProgressDialog(getActivity());
-        btn_changeimage_setting = (FloatingActionButton) view.findViewById(R.id.change_image_setting);
-        btn_changeimage_setting.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                galleryIntent(REQUEST_IMAGE_CAPTURE);
-            }
-        });
+        mProgressDialog = new ProgressDialog(SettingsFragment.this);
         mStorageReference = FirebaseStorage.getInstance().getReference();
 
         mCurrentuser = FirebaseAuth.getInstance().getCurrentUser();
@@ -131,53 +133,111 @@ public class SettingsFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-       if (getActivity() == null){
-           return;
-       }else {
-           snama = dataSnapshot.child("nama").getValue().toString();
-           saddress = dataSnapshot.child("alamat").getValue().toString();
-           semail = dataSnapshot.child("email").getValue().toString();
-           sjabatan = dataSnapshot.child("jabatan").getValue().toString();
-           snip = dataSnapshot.child("nip").getValue().toString();
-           srule = dataSnapshot.child("role").getValue().toString();
-           snohp = dataSnapshot.child("noHp").getValue().toString();
-           simage = dataSnapshot.child("image").getValue().toString();
+              /*  if (getActivity() == null){
+                    return;
+                }else {*/
+                if (SettingsFragment.this != null){
+                    snama = dataSnapshot.child("nama").getValue().toString();
+                    saddress = dataSnapshot.child("alamat").getValue().toString();
+                    semail = dataSnapshot.child("email").getValue().toString();
+                    sjabatan = dataSnapshot.child("jabatan").getValue().toString();
+                    snip = dataSnapshot.child("nip").getValue().toString();
+                    srule = dataSnapshot.child("role").getValue().toString();
+                    snohp = dataSnapshot.child("noHp").getValue().toString();
+                    simage = dataSnapshot.child("image").getValue().toString();
 
-           mDisplayname.setText(""+snama);
-           name.setText(""+snama);
-           maddresprofil.setText(""+saddress);;
-           email.setText(""+semail);
-           jabatan.setText(""+sjabatan);
-           nip.setText(""+snip);
-           rule.setText(""+srule);;
-           nohp_setting.setText(""+snohp);
-           address_setting.setText(""+saddress);
-           //set display image
-           Log.i("uri image", ""+simage);
-           if (!simage.equals("default")){
-               Glide.with(SettingsFragment.this).load(simage).listener(new RequestListener<Drawable>() {
-                   @Override
-                   public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                       return false;
-                   }
+                    mDisplayname.setText(""+snama);
+                    name.setText(""+snama);
+                    maddresprofil.setText(""+saddress);;
+                    email.setText(""+semail);
+                    jabatan.setText(""+sjabatan);
+                    nip.setText(""+snip);
+                    rule.setText(""+srule);;
+                    nohp_setting.setText(""+snohp);
+                    address_setting.setText(""+saddress);
+                    //set display image
+                    Log.i("uri image", ""+simage);
+                    if (!simage.equals("default")){
+                        Glide.with(SettingsFragment.this).load(simage).listener(new RequestListener<Drawable>() {
+                            @Override
+                            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                                return false;
+                            }
 
-                   @Override
-                   public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                       return false;
-                   }
-               }).into(mCircleImageView);
-           }else {
+                            @Override
+                            public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                                return false;
+                            }
+                        }).into(mCircleImageView);
+                    }else {
 
-           }
-       }
+
+                    }
+                }
             }
-
+            /*  }
+             */
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
         });
-        return  view;
+        btn_changeimage_setting = findViewById(R.id.change_image_setting);
+        btn_changeimage_setting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                galleryIntent(REQUEST_IMAGE_CAPTURE);
+                /*Intent galery_intent = new Intent();
+                galery_intent.setType("image/*");
+                galery_intent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(Intent.createChooser(galery_intent,"Select Image"),GALLERY_PICK);*/
+             /*   if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE)
+                        == PackageManager.PERMISSION_DENIED) {
+
+                    //Meminta Akses Camera
+                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_IMAGE_CAPTURE);
+
+                }
+                //CHEK Permission MENYIMPAN FILE (Storage)
+                else if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        == PackageManager.PERMISSION_DENIED) {
+
+                    //MEMINTA ACCES
+                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_IMAGE_CAPTURE);
+                } else {
+
+
+                    *//* ==========Jika AKses diberikan, maka penggil Intent Camera =========*//*
+                    Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+
+                        //Generate Name
+                        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+                        photofile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), timeStamp + "anu.jpg");
+
+                        //Chek photofile tidak null;
+                        if (photofile != null) {
+
+                            //Mendapatkan Alamat URi dari foto File
+                            imageUri = Uri.fromFile(photofile);
+
+                            //Mengirim ALamat Uri
+                            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+
+                            //Memanggil Activity Onresult dari Camera Intent
+                            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+
+
+                        } else {
+                            Toast.makeText(getActivity(), "PHOTO FILE NULL", Toast.LENGTH_LONG).show();
+                        }
+
+                    }
+                }*/
+            }
+        });
+
+
     }
 
     private void galleryIntent(int requestImageCapture) {
@@ -194,9 +254,11 @@ public class SettingsFragment extends Fragment {
                 .start(requestImageCapture); // start image picker activity with request code
     }
 
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        Log.e("masuk result", "masuk result");
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK){
             Image image = ImagePicker.getFirstImageOrNull(data);
             imageFile = new File(image.getPath());
@@ -206,13 +268,13 @@ public class SettingsFragment extends Fragment {
 
                 //Kompress File asal kedalam File Baru dengan ukuran lebih ringan
                 try {
-                    File newsfile = new Compressor(getActivity())
+                    File newsfile = new Compressor(SettingsFragment.this)
                             .compressToFile(imageFile);
                     imageUri = Uri.fromFile(newsfile);
 
                     CropImage.activity(imageUri)
                             .setAspectRatio(1, 1)
-                            .start(getContext(),this);
+                            .start(this);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -230,7 +292,7 @@ public class SettingsFragment extends Fragment {
                 mProgressDialog.setCanceledOnTouchOutside(false);
                 mProgressDialog.show();
 
-               imageUri  = result.getUri();
+                imageUri  = result.getUri();
                 mCurrentuser = FirebaseAuth.getInstance().getCurrentUser();
                 final String uid = mCurrentuser.getUid();
 
@@ -239,7 +301,7 @@ public class SettingsFragment extends Fragment {
 
                 Bitmap thum_bitmap = null;
                 try {
-                    thum_bitmap = new Compressor(getActivity())
+                    thum_bitmap = new Compressor(SettingsFragment.this)
                             .setMaxHeight(200)
                             .setMaxWidth(200)
                             .setQuality(75)
@@ -260,53 +322,53 @@ public class SettingsFragment extends Fragment {
                         if (task.isSuccessful()) {
                             //Toast.makeText(SettingActivity.this,"working",Toast.LENGTH_LONG).show();
 
-                           filepath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                               @Override
-                               public void onSuccess(Uri uri) {
+                            filepath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                @Override
+                                public void onSuccess(Uri uri) {
 
-                                   final  Uri downloadUri = uri;
-                                   final String sdownloadUri = downloadUri.toString();
-                                   //upload task thumb
-                                   UploadTask uploadTask = thumb_filepath.putBytes(thumb_byte);
-                                   uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                                       @Override
-                                       public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> thumb_task) {
+                                    final  Uri downloadUri = uri;
+                                    final String sdownloadUri = downloadUri.toString();
+                                    //upload task thumb
+                                    UploadTask uploadTask = thumb_filepath.putBytes(thumb_byte);
+                                    uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> thumb_task) {
 
-                                           if (thumb_task.isSuccessful()) {
-
-
-                                               Map update_hasmap = new HashMap();
-                                               update_hasmap.put("image",""+sdownloadUri);
-                                               update_hasmap.put("thumb_image","default");
+                                            if (thumb_task.isSuccessful()) {
 
 
-                                               mDatabaseReference.updateChildren(update_hasmap).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                   @Override
-                                                   public void onComplete(@NonNull final Task<Void> task) {
-                                                       if (task.isSuccessful()) {
-                                                           mProgressDialog.dismiss();
-                                                           Toast.makeText(getActivity(), "Succes Upload", Toast.LENGTH_LONG).show();
+                                                Map update_hasmap = new HashMap();
+                                                update_hasmap.put("image",""+sdownloadUri);
+                                                update_hasmap.put("thumb_image","default");
 
 
-                                                       }
-                                                       else {
-                                                           mProgressDialog.dismiss();
-                                                           Toast.makeText(getActivity(), "Upload Failed", Toast.LENGTH_LONG).show();
-                                                       }
-                                                   }
-                                               });
-                                           } else {
-                                               Toast.makeText(getActivity(), "Error upload thumb", Toast.LENGTH_LONG).show();
-                                               mProgressDialog.dismiss();
-                                           }
-                                       }
-                                   });
+                                                mDatabaseReference.updateChildren(update_hasmap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                    @Override
+                                                    public void onComplete(@NonNull final Task<Void> task) {
+                                                        if (task.isSuccessful()) {
+                                                            mProgressDialog.dismiss();
+                                                            Toast.makeText(SettingsFragment.this, "Succes Upload", Toast.LENGTH_LONG).show();
 
-                               }
-                           }) ;
+
+                                                        }
+                                                        else {
+                                                            mProgressDialog.dismiss();
+                                                            Toast.makeText(SettingsFragment.this, "Upload Failed", Toast.LENGTH_LONG).show();
+                                                        }
+                                                    }
+                                                });
+                                            } else {
+                                                Toast.makeText(SettingsFragment.this, "Error upload thumb", Toast.LENGTH_LONG).show();
+                                                mProgressDialog.dismiss();
+                                            }
+                                        }
+                                    });
+
+                                }
+                            }) ;
 
                         } else {
-                            Toast.makeText(getActivity(), "Error upload", Toast.LENGTH_LONG).show();
+                            Toast.makeText(SettingsFragment.this, "Error upload", Toast.LENGTH_LONG).show();
                             mProgressDialog.dismiss();
                         }
 

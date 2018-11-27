@@ -1,40 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:orientation="vertical"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".fragment_mainActivity.DashboardMonitoringFragment">
 
-    <com.google.android.gms.maps.MapView android:id="@+id/mapview_monitoring"
+    <com.google.android.gms.maps.MapView
+        android:id="@+id/mapview_monitoring"
         android:layout_width="match_parent"
+        android:layout_height="240dp"
 
-
-        android:layout_height="300dp"
         />
+
+
+
+    <android.support.v4.view.ViewPager
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+
+
+        android:id="@+id/viewpager_monitoring"
+        android:layout_below="@+id/include"
+       >
+
+    </android.support.v4.view.ViewPager>
+
     <include
+        android:id="@+id/include"
+        layout="@layout/app_bar_dashboard_monitoring"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        layout="@layout/app_bar_dashboard_monitoring"
-        android:id="@+id/include"
-        app:layout_constraintBottom_toBottomOf="@+id/mapview_monitoring">
+
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/mapview_monitoring">
 
 
     </include>
 
-    <android.support.v4.view.ViewPager
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-
-        android:layout_marginBottom="8dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/include"
-        app:layout_constraintVertical_bias="0.025"
-        tools:ignore="MissingConstraints"
-        android:id="@+id/viewpager_monitoring"
-        tools:layout_editor_absoluteX="16dp">
-
-    </android.support.v4.view.ViewPager>
-
-</android.support.constraint.ConstraintLayout>
+</RelativeLayout>

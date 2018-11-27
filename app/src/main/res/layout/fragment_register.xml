@@ -16,13 +16,13 @@
         <android.support.design.widget.CollapsingToolbarLayout
 
             android:id="@+id/collapsing"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             app:layout_scrollFlags="exitUntilCollapsed|scroll"
             xmlns:app="http://schemas.android.com/apk/res-auto"
             app:contentScrim="@color/colorPrimary"
-            android:background="@drawable/patuhoatlogo"
-            app:title="Absensi Project"
+            android:background="@drawable/image_11"
+            app:title=""
             >
 
             <android.support.v7.widget.Toolbar
@@ -88,6 +88,10 @@
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="3dp"
                     android:hint="@string/email"
+                    android:inputType="textEmailAddress"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:textColorHighlight="@color/colorPrimary"
                     android:textColorHint="@color/colorPrimary"
                     android:textColorLink="@color/colorPrimaryDark" />
             </android.support.design.widget.TextInputLayout>
@@ -113,7 +117,10 @@
                     android:layout_marginStart="8dp"
                     android:inputType="textPassword"
 
-                    android:hint="@string/password"
+                    android:hint="password (8 karakter)"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:textColorHighlight="@color/colorPrimary"
                     android:textColorHint="@color/colorPrimary"
                     android:textColorLink="@color/colorPrimaryDark" />
             </android.support.design.widget.TextInputLayout>
@@ -135,6 +142,10 @@
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="3dp"
                     android:hint="@string/display_name"
+                    android:inputType="textPersonName"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:textColorHighlight="@color/colorPrimary"
                     android:textColorHint="@color/colorPrimary"
                     android:textColorLink="@color/colorPrimaryDark" />
             </android.support.design.widget.TextInputLayout>
@@ -156,6 +167,10 @@
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="3dp"
                     android:hint="Jabatan"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:textColorHighlight="@color/colorPrimary"
                     android:textColorHint="@color/colorPrimary"
                     android:textColorLink="@color/colorPrimaryDark" />
             </android.support.design.widget.TextInputLayout>
@@ -177,6 +192,10 @@
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="3dp"
                     android:hint="Nomor Induk Pegawai"
+                    android:inputType="textEmailAddress"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:textColorHighlight="@color/colorPrimary"
                     android:textColorHint="@color/colorPrimary"
                     android:textColorLink="@color/colorPrimaryDark" />
             </android.support.design.widget.TextInputLayout>
@@ -187,7 +206,12 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="3dp"
                 android:layout_marginStart="8dp"
-
+                android:inputType="number"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:textColorHint="@color/colorPrimaryDark"
+                android:textColorLink="@color/colorPrimaryDark"
+                android:textColorHighlight="@color/colorPrimary"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.529"
                 app:layout_constraintStart_toStartOf="parent"
@@ -226,6 +250,10 @@
                     android:layout_marginBottom="8dp"
                     android:layout_marginEnd="8dp"
                     android:layout_marginLeft="8dp"
+                    android:inputType="text"
+                    android:textColorHint="@color/colorPrimaryDark"
+                    android:textColorLink="@color/colorPrimaryDark"
+                    android:textColorHighlight="@color/colorPrimary"
                     android:layout_marginRight="8dp"
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"

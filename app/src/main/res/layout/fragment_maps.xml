@@ -2,11 +2,65 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent" >
+    android:layout_height="fill_parent"
+    android:orientation="vertical">
 
     <com.google.android.gms.maps.MapView android:id="@+id/mapview"
         android:layout_width="match_parent"
         android:layout_height="300dp"
         />
+
+<android.support.v7.widget.CardView
+    android:visibility="gone"
+    android:id="@+id/cardviewMaps"
+    android:layout_width="match_parent"
+    android:layout_margin="5dp"
+    android:layout_marginTop="30dp"
+    android:layout_height="wrap_content">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/timechekin"
+            android:layout_margin="5dp"
+            android:gravity="center_horizontal"
+            android:text="Check In pada : 08:00 WIB"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Pada Jarak : 08:00 WIB"
+            android:layout_margin="5dp"
+            android:id="@+id/time_distance"
+            android:layout_below="@+id/timechekin"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Time Ago : 45 minute ago"
+            android:layout_margin="5dp"
+            android:visibility="gone"
+            android:id="@+id/timeago"
+            android:layout_below="@+id/time_distance"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/timeworking"
+            android:layout_margin="5dp"
+            android:text="working time : 5 Hours"
+            android:layout_below="@+id/timeago"
+            android:layout_marginBottom="5dp"/>
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Not yet Check In"
+        android:layout_marginTop="100dp"
+        android:id="@+id/notifmaps"
+        android:layout_gravity="center"/>
 
 </LinearLayout>

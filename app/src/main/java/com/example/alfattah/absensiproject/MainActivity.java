@@ -2,8 +2,10 @@ package com.example.alfattah.absensiproject;
 
 
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -28,6 +30,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.example.alfattah.absensiproject.fragment_mainActivity.AboutFragment;
 import com.example.alfattah.absensiproject.fragment_mainActivity.DashboardFragment;
 import com.example.alfattah.absensiproject.fragment_mainActivity.DashboardMonitoringFragment;
@@ -46,6 +53,7 @@ import com.google.firebase.database.ValueEventListener;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -60,13 +68,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private DatabaseReference mdataperusahaan;
 
 
-    /*//user display
-    @BindView(R.id.display_Profil)
-    TextView display_profil;
-    @BindView(R.id.display_name)
+    //user display
+    /*@BindView(R.id.display_profil_cirle)*/
+    CircleImageView circleImageView;
+    /*@BindView(R.id.display_name)*/
     TextView display_name;
-    @BindView(R.id.display_address)
-    TextView display_address;*/
+    /*@BindView(R.id.display_job)*/
+    TextView display_address;
     //navigation menu
     @BindView(R.id.drawer_layout_main)
     DrawerLayout drawer;
@@ -101,7 +109,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 drawer.openDrawer(GravityCompat.START);
             }
         });
+
+        //navigation action
+        navigationView.setNavigationItemSelectedListener((NavigationView.OnNavigationItemSelectedListener) this);
+
+        View inflateView = navigationView.getHeaderView(0);
         preferenceManager = new PreferenceManager(this);
+        circleImageView = inflateView.findViewById(R.id.display_profil_cirle);
+        display_name = inflateView.findViewById(R.id.display_name);
+        display_address = inflateView.findViewById(R.id.display_job);
+
+        //userinformation
+
 
 
         //Getting Uid user
@@ -111,14 +130,46 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             mUserRef = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getCurrentUser().getUid());
 
-            mUserRef.child("role").addValueEventListener(new ValueEventListener() {
+            mUserRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    String srole = dataSnapshot.getValue().toString();
+                    String name = ""+dataSnapshot.child("nama").getValue().toString();
+                    String jabatan = ""+dataSnapshot.child("jabatan").getValue().toString();
+                    String image = ""+dataSnapshot.child("image").getValue().toString();
+                    display_name.setText(""+name);
+                    display_address.setText(""+jabatan);
+                    if (!image.equals("default") && image!= null){
+                        Glide.with(getApplicationContext()).load(image).listener(new RequestListener<Drawable>() {
+                            @Override
+                            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                                return false;
+                            }
 
-                    preferenceManager.simpanRole(srole);
-                    setdashbourUI(preferenceManager.ambilRole());
+                            @Override
+                            public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                                return false;
+                            }
+                        }).into(circleImageView);
+                    }else {
 
+                    }
+
+                    mUserRef.child("role").addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            String srole = dataSnapshot.getValue().toString();
+
+
+                            preferenceManager.simpanRole(srole);
+                            setdashbourUI(preferenceManager.ambilRole());
+
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
                 }
 
                 @Override
@@ -151,8 +202,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
 
-        //navigation action
-        navigationView.setNavigationItemSelectedListener((NavigationView.OnNavigationItemSelectedListener) this);
+
 
 
     }
@@ -162,6 +212,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void setFragment(Fragment fragment) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.frame_main, fragment);
+        /*fragmentTransaction.addToBackStack(null);*/
         fragmentTransaction.commit();
     }
     private void setdashbourUI(String role) {
@@ -169,7 +220,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
            if (role.equalsIgnoreCase("staff")){
                FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
                fragmentTransaction.replace(R.id.frame_main, dashboardFragment);
-               fragmentTransaction.commit();
+               fragmentTransaction.commitAllowingStateLoss();
 
            }else {
                checkdataperusahaan();
@@ -304,38 +355,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                    manager.beginTransaction().replace(R.id.frame_main, dashboardFragment).commit();
                    break;
                }else if (cekrole.equalsIgnoreCase("Monitoring")){
-                   mdataperusahaan.addValueEventListener(new ValueEventListener() {
-                       @Override
-                       public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                           if (!dataSnapshot.hasChild("Dataperusahaan")){
-                               //belum ada data perusahaan
-                               FragmentManager manager = getSupportFragmentManager();
-                               manager.beginTransaction().replace(R.id.frame_main, inputDataPerusahaanFragment).commit();
-
-
-                           }else {
-                               //sudah ada data perusahaan
-                               FragmentManager manager = getSupportFragmentManager();
-                               manager.beginTransaction().replace(R.id.frame_main, dashboardMonitoringFragment).commit();
-
-
-                           }
-                       }
-
-                       @Override
-                       public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                       }
-                   });
-                   break;
-
-               }else {
+                   checkdataperusahaan();
                    break;
 
                }
+               break;
 
             case R.id.acountSettings:
-                setFragment(settingsFragment);
+                /*setFragment(settingsFragment);*/
+                Intent intent = new Intent(MainActivity.this,SettingsFragment.class);
+                startActivity(intent);
                 break;
             case R.id.Logout:
                 mUserRef.child("online").setValue(ServerValue.TIMESTAMP);

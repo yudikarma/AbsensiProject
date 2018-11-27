@@ -33,24 +33,24 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+
             <de.hdodenhof.circleimageview.CircleImageView
                 android:layout_width="150dp"
                 android:layout_height="150dp"
-                android:src="@drawable/circlelogo"
                 android:layout_gravity="center"
                 android:layout_marginBottom="10dp"
                 android:layout_marginTop="20dp"
-                app:civ_border_color="@color/birumuda"
-                app:civ_border_width="2dp"/>
+                android:src="@drawable/logo" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Patuh OAT"
-                android:textSize="24sp"
-                android:textColor="@color/hitamflat"
-                android:textStyle="bold"
                 android:layout_gravity="center"
-                android:layout_marginBottom="0dp"/>
+                android:layout_marginBottom="0dp"
+                android:text="Absensi Project"
+                android:textColor="@color/hitamflat"
+                android:textSize="24sp"
+                android:textStyle="bold" />
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"

@@ -46,7 +46,7 @@ public class DashboardFragment extends Fragment {
         // Inflate the layout for this fragment
         View  view =  inflater.inflate(R.layout.fragment_dashboard, container, false);
         dashboardPageviewAdapter = new DashboardPageviewAdapter(getChildFragmentManager());
-        dashboardViewpager = view.findViewById(R.id.viewPagerdashboard);
+        dashboardViewpager = view.findViewById(R.id.viewPagerdashboardstaff);
         dashboardViewpager.setAdapter(dashboardPageviewAdapter);
 
         preferenceManager = new PreferenceManager(Objects.requireNonNull(getActivity()));

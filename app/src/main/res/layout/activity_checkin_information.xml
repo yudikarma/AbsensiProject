@@ -51,71 +51,64 @@
          android:textColor="@android:color/black"
          android:textSize="24sp"
          android:textStyle="bold" />
-     <ImageView
-         android:id="@+id/checkin_selfie"
-         android:layout_width="400dp"
-         android:layout_height="300dp"
-         app:srcCompat="@drawable/image_9" />
+         <LinearLayout
+             android:layout_width="match_parent"
+             android:layout_margin="1dp"
+             android:layout_marginTop="15dp"
+             android:layout_height="wrap_content">
+             <TextView
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_margin="1dp"
-        android:layout_height="wrap_content">
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-            <TextView
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:text="Latitude       :  "
+                 android:textColor="@color/hitamflat"
+                 android:layout_marginStart="10dp"
+                 android:textSize="14sp" />
+             <TextView
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:id="@+id/checkin_latitude"
+                 android:text="5.5443836"/>
+         </LinearLayout>
+         <LinearLayout
+             android:layout_width="match_parent"
+             android:layout_margin="1dp"
 
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Latitude       :  "
-                android:textColor="@color/hitamflat"
-                android:layout_marginStart="10dp"
-                android:textSize="14sp" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/checkin_latitude"
-                android:text="5.5443836"/>
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_gravity="end"
-            android:layout_height="wrap_content">
-            <TextView
+             android:layout_height="wrap_content">
+             <TextView
 
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Longitude   :  "
-                android:textColor="@color/hitamflat"
-                android:layout_marginStart="10dp"
-                android:textSize="14sp" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/checkin_longitude"
-                android:text="95.3234944"/>
-        </LinearLayout>
-    </LinearLayout>
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:text="Longitude   :  "
+                 android:textColor="@color/hitamflat"
+                 android:layout_marginStart="10dp"
+                 android:textSize="14sp" />
+             <TextView
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:id="@+id/checkin_longitude"
+                 android:text="95.3234944"/>
+         </LinearLayout>
+
 
          <LinearLayout
              android:layout_width="match_parent"
              android:layout_margin="1dp"
              android:layout_height="wrap_content">
 
-                 <TextView
+             <TextView
 
-                     android:layout_width="wrap_content"
-                     android:layout_height="wrap_content"
-                     android:text="Time             :  "
-                     android:textColor="@color/hitamflat"
-                     android:layout_marginStart="10dp"
-                     android:textSize="14sp" />
-                 <TextView
-                     android:layout_width="wrap_content"
-                     android:layout_height="wrap_content"
-                     android:id="@+id/checkin_time"
-                     android:text="08.45.53"/>
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:text="Time             :  "
+                 android:textColor="@color/hitamflat"
+                 android:layout_marginStart="10dp"
+                 android:textSize="14sp" />
+             <TextView
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:id="@+id/checkin_time"
+                 android:text="08.45.53"/>
 
 
          </LinearLayout>
@@ -163,6 +156,14 @@
 
 
          </LinearLayout>
+     <ImageView
+         android:id="@+id/checkin_selfie"
+         android:layout_width="400dp"
+         android:layout_height="300dp"
+         app:srcCompat="@drawable/image_9" />
+
+
+
 
 
 

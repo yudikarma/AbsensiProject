@@ -41,6 +41,8 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 import com.example.alfattah.absensiproject.R;
 
+import java.util.Objects;
+
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -69,13 +71,13 @@ public class ListUserCheckoutFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_list_user_checkout, container, false);
         recyclerView = rootView.findViewById(R.id.listchekout);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        /*recyclerView.setHasFixedSize(true);*/
 
         Query query = FirebaseDatabase.getInstance().getReference().child("checkout").limitToLast(50);
         FirebaseRecyclerOptions options = new FirebaseRecyclerOptions.Builder<ChekinModel>()
                 .setQuery(query, ChekinModel.class)
-                .setLifecycleOwner(getActivity())
+                .setLifecycleOwner(this)
                 .build();
 
         adapter = new FirebaseRecyclerAdapter<ChekinModel, UserviewHolder>(options) {
@@ -88,7 +90,12 @@ public class ListUserCheckoutFragment extends Fragment {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         holder.setNama(dataSnapshot.child("nama").getValue().toString());
-                        holder.setMcCircleImageView(dataSnapshot.child("image").getValue().toString());
+                        String imageuri = dataSnapshot.child("image").getValue().toString();
+                        if (!imageuri.equals("image")){
+                            holder.setMcCircleImageView(""+dataSnapshot.child("image").getValue().toString());
+                        }else {
+                            holder.setMcCircleImageView(null);
+                        }
                         holder.settimestamp(dataSnapshot.child("jabatan").getValue().toString());
                         /*holder.mView.setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -118,6 +125,8 @@ public class ListUserCheckoutFragment extends Fragment {
 
             }
         };
+        adapter.startListening();
+        adapter.notifyDataSetChanged();
 
         recyclerView.setAdapter(adapter);
 
@@ -155,8 +164,8 @@ public class ListUserCheckoutFragment extends Fragment {
         }
         public  void setMcCircleImageView(final String img_uri){
             //Picasso.with(UsersActivity.this).load(img_uri).placeholder(R.drawable.user).into(mcCircleImageView);
-            if (!img_uri.equals("default") && img_uri != null){
-                Glide.with(getActivity()).load(img_uri).listener(new RequestListener<Drawable>() {
+            if (img_uri != null){
+                Glide.with(Objects.requireNonNull(getActivity()).getApplicationContext()).load(img_uri).listener(new RequestListener<Drawable>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
                         return false;
@@ -168,6 +177,8 @@ public class ListUserCheckoutFragment extends Fragment {
                     }
                 }).into(mcCircleImageView);
             }else {
+
+                mcCircleImageView.setImageResource(R.drawable.avatar);
 
             }
         }
